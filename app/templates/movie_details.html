@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ movie.title }}</h2>
+<p><strong>Release Date:</strong> {{ movie.release_date.strftime('%d-%m-%Y') }}</p>
+<p><strong>Description:</strong> {{ movie.description }}</p>
+
+<!-- Favorite/Unfavorite Button -->
+<div>
+    <button id="favorite-btn" class="btn btn-primary">
+        {% if movie in current_user.favorites %}
+        Unfavorite
+        {% else %}
+        Favorite
+        {% endif %}
+    </button>
+</div>
+
+<h3>Reviews</h3>
+<ul>
+    {% for review in reviews %}
+    <li>
+        <p><strong>Reviewer:</strong> {{ review.reviewer.username }}</p>
+        <p><strong>Rating:</strong> {{ review.rating }}/5</p>
+        <p>{{ review.content }}</p>
+        <p><em>Posted on {{ review.date_posted.strftime('%d-%m-%Y %H:%M:%S') }}</em></p>
+    </li>
+    {% else %}
+    <p>No reviews yet. Be the first to leave one!</p>
+    {% endfor %}
+</ul>
+
+<!-- Review Form -->
+<h3>Leave a Review</h3>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.rating.label }}<br>
+        {{ form.rating(size=5) }}
+    </div>
+    <div>
+        {{ form.content.label }}<br>
+        {{ form.content() }}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<!-- Recommended Movies Section -->
+<h3>Recommended Movies</h3>
+<div class="recommended-movies">
+    {% if recommended_movies %}
+        <ul>
+            {% for recommended_movie in recommended_movies %}
+            <li>
+                <a href="{{ url_for('main.movie_details', movie_id=recommended_movie.id) }}">
+                    {{ recommended_movie.title }}
+                </a>
+                ({{ recommended_movie.release_date.strftime('%d-%m-%Y') }})
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+    <p>No recommendations available for this movie.</p>
+    {% endif %}
+</div>
+
+<script>
+    // AJAX for Favorite/Unfavorite Button
+    document.getElementById('favorite-btn').addEventListener('click', function() {
+        fetch(`/movies/{{ movie.id }}/toggle_favorite`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'added') {
+                this.textContent = 'Unfavorite';
+            } else if (data.status === 'removed') {
+                this.textContent = 'Favorite';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
+{% endblock %}

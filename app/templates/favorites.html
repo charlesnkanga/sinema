@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center">Your Favorite Movies</h1>
+    {% if movies %}
+    <ul class="list-group">
+        {% for movie in movies %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <h2>{{ movie.title }}</h2>
+                <p>{{ movie.description }}</p>
+                <small>Release Date: {{ movie.release_date.strftime('%d-%m-%Y') }}</small>
+            </div>
+            <button class="btn favorite-button" data-movie-id="2" aria-label="Add to favorites">
+                <i class="fas fa-heart text-danger"></i>
+            </button>
+            
+            <script>
+                document.querySelectorAll('.favorite-button').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const isFavorited = button.querySelector('.fa-heart').classList.contains('text-danger');
+            
+                        if (isFavorited) {
+                            button.setAttribute('aria-label', 'Remove from favorites');
+                        } else {
+                            button.setAttribute('aria-label', 'Add to favorites');
+                        }
+                    });
+                });
+            </script>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-center">You have no favorite movies yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

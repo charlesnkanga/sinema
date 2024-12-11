@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Movie List</h1>
+<ul>
+    {% for movie in movies %}
+<li>
+    <strong>{{ movie.title }}</strong> ({{ movie.release_date }})
+    <p>{{ movie.description }}</p>
+
+    <!-- Favorite/Unfavorite Button -->
+    <form class="favorite-form" data-movie-id="{{ movie.id }}">
+        
+        <button type="submit" class="btn btn-{{ 'success' if movie.is_favorited else 'primary' }}">
+            {{ 'Unfavorite' if movie.is_favorited else 'Favorite' }}
+        </button>
+    </form>
+</li>
+{% endfor %}
+</ul>
+
+<!-- JavaScript for AJAX -->
+<script src="{{ url_for('static', filename='js/favorites.js') }}"></script>
+{% endblock %}
